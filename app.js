@@ -6,6 +6,9 @@ const upload = multer(); // for parsing multipart/form-data
 const app = express();
 const port = 15002;
 
+// 设置 GIT_SSH_COMMAND 环境变量
+process.env['GIT_SSH_COMMAND'] = 'ssh -i /root/.ssh/lys_github_rsa';
+
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
