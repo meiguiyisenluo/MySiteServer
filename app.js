@@ -34,14 +34,14 @@ app.post("/webhook", upload.array(), (req, res) => {
   console.log(`Received ${event} event with delivery id ${deliveryId}`);
   console.log(`From repository ${repoName} and branch ${branch}`);
 
-  // exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
-  //   if (error) {
-  //     console.error("error:", error);
-  //     return;
-  //   }
-  //   console.log("stdout: " + stdout);
-  //   console.log("stderr: " + stderr);
-  // });
+  exec(`/root/buildMission/${repoName}.sh`, {}, (error, stdout, stderr) => {
+    if (error) {
+      console.error("error:", error);
+      return;
+    }
+    console.log("stdout: " + stdout);
+    console.log("stderr: " + stderr);
+  });
   res.sendStatus(200);
 });
 
