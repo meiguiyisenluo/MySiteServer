@@ -7,7 +7,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/webhook", (req, res) => {
+app.post("/webhook", (req, res) => {
   console.log(req);
   exec("/root/buildMission/YiSen.sh", {}, () => {});
   res.sendStatus(200);
