@@ -9,7 +9,14 @@ app.get("/", (req, res) => {
 
 app.post("/webhook", (req, res) => {
   console.log(req);
-  exec("/root/buildMission/YiSen.sh", {}, () => {});
+  exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
+    if (error) {
+      console.error("error:", error);
+      return;
+    }
+    console.log("stdout: " + stdout);
+    console.log("stderr: " + stderr);
+  });
   res.sendStatus(200);
 });
 
