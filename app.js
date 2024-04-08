@@ -8,7 +8,14 @@ app.get("/", (req, res) => {
 });
 
 app.post("/webhook", (req, res) => {
-  console.log(req);
+  const event = req.headers["x-github-event"];
+  const deliveryId = req.headers["x-github-delivery"];
+  const repository = req.body.repository;
+  const branch = req.body.ref.split("/").pop();
+
+  console.log(`Received ${event} event with delivery id ${deliveryId}`);
+  console.log(`From repository ${repository.full_name} and branch ${branch}`);
+
   exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
     if (error) {
       console.error("error:", error);
