@@ -22,14 +22,14 @@ app.post("/webhook", (req, res) => {
   console.log("");
   console.log(req.body);
 
-  exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
-    if (error) {
-      console.error("error:", error);
-      return;
-    }
-    console.log("stdout: " + stdout);
-    console.log("stderr: " + stderr);
-  });
+  // exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
+  //   if (error) {
+  //     console.error("error:", error);
+  //     return;
+  //   }
+  //   console.log("stdout: " + stdout);
+  //   console.log("stderr: " + stderr);
+  // });
   res.sendStatus(200);
 });
 
