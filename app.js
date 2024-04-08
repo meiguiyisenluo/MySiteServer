@@ -23,17 +23,16 @@ app.post("/test", upload.array(), (req, res) => {
   res.send("Hello World!");
 });
 
-app.post("/webhook", upload.array(),(req, res) => {
-  // const event = req.headers["x-github-event"];
-  // const deliveryId = req.headers["x-github-delivery"];
-  // const repository = req.body.repository;
-  // const branch = req.body.ref.split("/").pop();
+app.post("/webhook", upload.array(), (req, res) => {
+  const event = req.headers["x-github-event"];
+  const deliveryId = req.headers["x-github-delivery"];
+  const payload = JSON.parse(req.body.payload);
+  const repository = payload.repository;
+  const repoName = repository.name;
+  const branch = payload.ref.split("/").pop();
 
-  // console.log(`Received ${event} event with delivery id ${deliveryId}`);
-  // console.log(`From repository ${repository.full_name} and branch ${branch}`);
-  console.log(req.headers);
-  console.log("");
-  console.log(req.body);
+  console.log(`Received ${event} event with delivery id ${deliveryId}`);
+  console.log(`From repository ${repoName} and branch ${branch}`);
 
   // exec("/root/buildMission/YiSen.sh", {}, (error, stdout, stderr) => {
   //   if (error) {
