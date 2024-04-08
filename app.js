@@ -1,4 +1,4 @@
-const { execSync } = require("child_process");
+const { exec } = require("child_process");
 const express = require("express");
 const app = express();
 const port = 15002;
@@ -9,8 +9,8 @@ app.get("/", (req, res) => {
 
 app.get("/webhook", (req, res) => {
   console.log(req);
-  execSync("/root/buildMission/YiSen.sh");
-  res.send(200);
+  exec("/root/buildMission/YiSen.sh", {}, () => {});
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {
