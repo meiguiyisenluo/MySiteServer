@@ -1,13 +1,28 @@
 const { exec } = require("child_process");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer"); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
+
+const OmgTV = require("./routers/OmgTV.js");
+
 const app = express();
 const port = 15002;
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(socket.id);
+});
 
 // 设置 GIT_SSH_COMMAND 环境变量
-process.env['GIT_SSH_COMMAND'] = 'ssh -i /root/.ssh/lys_github_rsa';
+process.env["GIT_SSH_COMMAND"] = "ssh -i /root/.ssh/lys_github_rsa";
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -48,6 +63,9 @@ app.post("/webhook", upload.array(), (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(port, () => {
+// OmgTV
+app.use("/OmgTV", OmgTV);
+
+httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
