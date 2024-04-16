@@ -1,5 +1,6 @@
 const { exec } = require("child_process");
-const { createServer } = require("http");
+const { createServer } = require("https");
+const fs = require("fs");
 const { Server } = require("socket.io");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -10,7 +11,14 @@ const OmgTV = require("./routers/OmgTV.js");
 
 const app = express();
 const port = 15002;
-const httpServer = createServer(app);
+
+const httpServer = createServer(
+  {
+    key: fs.readFileSync("./ssl/luoyisen.com_nginx/luoyisen.com.key"),
+    cert: fs.readFileSync("./ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"),
+  },
+  app
+);
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
