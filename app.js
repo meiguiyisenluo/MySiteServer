@@ -1,3 +1,4 @@
+const uuid = require("uuid");
 const { exec } = require("child_process");
 const { createServer } = require("https");
 const fs = require("fs");
@@ -6,8 +7,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer"); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
-
-const OmgTV = require("./routers/OmgTV.js");
 
 const app = express();
 const port = 15002;
@@ -25,8 +24,66 @@ const io = new Server(httpServer, {
   },
 });
 
-io.on("connection", (socket) => {
-  console.log(socket.id);
+const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
+  const _this = this;
+  // update user count
+  OmgTVNsp.emit("userCount", _this.sockets.size);
+
+  // update
+  socket.on("setUserData", (data) => {
+    for (const key in data) {
+      socket.data[key] = data[key];
+    }
+  });
+
+  socket.on("match", async () => {
+    if (socket.rooms.size > 1) return;
+    const targets = [];
+    _this.sockets.forEach((socket) => {
+      if (socket.data.matching && socket.rooms.size <= 1) targets.push(socket);
+    });
+    if (targets.length) {
+      const socket2 = targets[0];
+      const roomId = uuid.v4();
+      socket.data.matching = false;
+      socket2.data.matching = false;
+      socket.join(roomId);
+      socket2.join(roomId);
+      socket.emit("match success", roomId, true);
+      socket2.emit("match success", roomId);
+    } else {
+      socket.data.matching = true;
+      socket.emit("match waiting");
+    }
+  });
+
+  const leaveRoomHandler = async () => {
+    let roomId = "";
+    socket.rooms.forEach((id) => {
+      if (id !== socket.id) roomId = id;
+    });
+    if (!roomId) return;
+    const sockets = await _this.in(roomId).fetchSockets();
+    sockets.forEach((socket) => {
+      socket.leave(roomId);
+      socket.emit("leaveRoom");
+    });
+  };
+
+  socket.on("leaveRoom", leaveRoomHandler);
+  socket.on("disconnecting", leaveRoomHandler);
+  socket.on("disconnect", () => {
+    OmgTVNsp.emit("userCount", _this.sockets.size);
+  });
+
+  socket.on("webrtc signaling", (data) => {
+    let roomId = "";
+    socket.rooms.forEach((id) => {
+      if (id !== socket.id) roomId = id;
+    });
+    if (!roomId) return;
+    socket.to(roomId).emit("webrtc signaling", data);
+  });
 });
 
 // 设置 GIT_SSH_COMMAND 环境变量
@@ -70,9 +127,6 @@ app.post("/webhook", upload.array(), (req, res) => {
   });
   res.sendStatus(200);
 });
-
-// OmgTV
-app.use("/OmgTV", OmgTV);
 
 httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
