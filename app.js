@@ -9,7 +9,7 @@ const multer = require("multer"); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
 
 const app = express();
-const port = 15002;
+const port = 3000;
 
 const httpServer = createServer(
   {
