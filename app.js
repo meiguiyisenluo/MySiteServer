@@ -98,12 +98,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.post("/test", upload.array(), (req, res) => {
-  console.log(req.body.test);
-  res.send("Hello World!");
+  res.send("Hello World Docker!!!");
 });
 
 app.post("/webhook", upload.array(), (req, res) => {
