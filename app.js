@@ -7,11 +7,27 @@ const express = require("express");
 const bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 const multer = require("multer"); // v1.0.5
-const upload = multer(); // for parsing multipart/form-data
+const { doubleCsrf } = require("csrf-csrf");
+
+// 设置 GIT_SSH_COMMAND 环境变量
+process.env["GIT_SSH_COMMAND"] = "ssh -i /root/.ssh/lys_github_rsa";
 
 const app = express();
 const port = 3000;
 
+const {
+  generateToken, // Use this in your routes to provide a CSRF hash + token cookie and token.
+  doubleCsrfProtection, // This is the default CSRF protection middleware.
+} = doubleCsrf({
+  getSecret: () => "sdfjklasfdjlksadfj", // A function that optionally takes the request and returns a secret
+  cookieName: "x-csrf-token", // The name of the cookie to be used, recommend using Host prefix.
+  // cookieOptions: {},
+  size: 64, // The size of the generated tokens in bits
+  ignoredMethods: ["HEAD", "OPTIONS"], // A list of request methods that will not be protected.
+  getTokenFromRequest: (req) => req.headers["x-csrf-token"], // A function that returns the token from the request
+});
+
+const upload = multer(); // for parsing multipart/form-data
 app.use(cookieParser());
 
 const httpServer = createServer(
@@ -21,12 +37,12 @@ const httpServer = createServer(
   },
   app
 );
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
   },
 });
-
 const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
   const _this = this;
   // update user count
@@ -89,9 +105,6 @@ const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
   });
 });
 
-// 设置 GIT_SSH_COMMAND 环境变量
-process.env["GIT_SSH_COMMAND"] = "ssh -i /root/.ssh/lys_github_rsa";
-
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
@@ -101,8 +114,10 @@ app.get("/", (req, res) => {
   );
 });
 
-app.get("/appsession", (req, res) => {
-  res.status(200).cookie("appsession", "true").send();
+app.get("/csrf-token", (req, res) => {
+  const csrfToken = generateToken(req, res);
+  // You could also pass the token into the context of a HTML response.
+  res.json({ csrfToken });
 });
 
 app.post("/webhook", upload.array(), (req, res) => {
@@ -127,11 +142,7 @@ app.post("/webhook", upload.array(), (req, res) => {
   res.sendStatus(200);
 });
 
-app.all("*", (req, res, next) => {
-  console.log(req.header("Referrer"));
-  if (req.cookies.appsession) next();
-  else res.status(403).send();
-});
+app.use(doubleCsrfProtection);
 
 app.get("/test", (req, res) => {
   res.send("test");
