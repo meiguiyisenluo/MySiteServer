@@ -96,7 +96,9 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.get("/", (req, res) => {
-  res.send("Hello World Docker!!!");
+  res.send(
+    "哥/姐，别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a>"
+  );
 });
 
 app.get("/appsession", (req, res) => {
@@ -126,6 +128,7 @@ app.post("/webhook", upload.array(), (req, res) => {
 });
 
 app.all("*", (req, res, next) => {
+  console.log(req.header("Referrer"));
   if (req.cookies.appsession) next();
   else res.status(403).send();
 });
