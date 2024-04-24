@@ -5,11 +5,14 @@ const fs = require("fs");
 const { Server } = require("socket.io");
 const express = require("express");
 const bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
 const multer = require("multer"); // v1.0.5
 const upload = multer(); // for parsing multipart/form-data
 
 const app = express();
 const port = 3000;
+
+app.use(cookieParser());
 
 const httpServer = createServer(
   {
@@ -92,27 +95,12 @@ process.env["GIT_SSH_COMMAND"] = "ssh -i /root/.ssh/lys_github_rsa";
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-app.all("*", (req, res, next) => {
-  // console.log(req.url)
-  // res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
-
 app.get("/", (req, res) => {
   res.send("Hello World Docker!!!");
 });
 
 app.get("/appsession", (req, res) => {
-  res.status(200).cookie("auth", "123").send();
-});
-
-app.all("*", (req, res, next) => {
-  console.log(req.cookies);
-  next();
-});
-
-app.get("/test", (req, res) => {
-  res.send("test");
+  res.status(200).cookie("appsession", "true").send();
 });
 
 app.post("/webhook", upload.array(), (req, res) => {
@@ -135,6 +123,15 @@ app.post("/webhook", upload.array(), (req, res) => {
     console.log("stderr: " + stderr);
   });
   res.sendStatus(200);
+});
+
+app.all("*", (req, res, next) => {
+  if (req.cookies.appsession) next();
+  else res.status(403).send();
+});
+
+app.get("/test", (req, res) => {
+  res.send("test");
 });
 
 httpServer.listen(port, () => {
