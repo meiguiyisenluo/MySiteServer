@@ -101,6 +101,19 @@ app.get("/", (req, res) => {
   res.send("Hello World Docker!!!");
 });
 
+app.get("/appsession", (req, res) => {
+  res.status(200).cookie("auth", "123").send();
+});
+
+app.all("*", (req, res, next) => {
+  console.log(req.cookies);
+  next();
+});
+
+app.get("/test", (req, res) => {
+  res.send("test");
+});
+
 app.post("/webhook", upload.array(), (req, res) => {
   const event = req.headers["x-github-event"];
   const deliveryId = req.headers["x-github-delivery"];
