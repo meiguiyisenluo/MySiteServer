@@ -93,7 +93,8 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 app.all("*", (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  // console.log(req.url)
+  // res.header("Access-Control-Allow-Origin", "*");
   next();
 });
 
