@@ -107,7 +107,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 
 app.get("/", (req, res) => {
   res.send(
-    "哥/姐，别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a>"
+    "靓仔美女们别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a>"
   );
 });
 
