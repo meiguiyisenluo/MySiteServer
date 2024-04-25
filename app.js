@@ -9,9 +9,6 @@ var cookieParser = require("cookie-parser");
 const multer = require("multer"); // v1.0.5
 const { doubleCsrf } = require("csrf-csrf");
 
-// 设置 GIT_SSH_COMMAND 环境变量
-process.env["GIT_SSH_COMMAND"] = "ssh -i /root/.ssh/lys_github_rsa";
-
 const app = express();
 const port = 3000;
 
@@ -120,31 +117,13 @@ app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken });
 });
 
-app.post("/webhook", upload.array(), (req, res) => {
-  const event = req.headers["x-github-event"];
-  const deliveryId = req.headers["x-github-delivery"];
-  const payload = JSON.parse(req.body.payload);
-  const repository = payload.repository;
-  const repoName = repository.name;
-  const branch = payload.ref.split("/").pop();
-
-  console.log(`Received ${event} event with delivery id ${deliveryId}`);
-  console.log(`From repository ${repoName} and branch ${branch}`);
-
-  exec(`/root/buildMission/${repoName}.sh`, {}, (error, stdout, stderr) => {
-    if (error) {
-      console.error("error:", error);
-      return;
-    }
-    console.log("stdout: " + stdout);
-    console.log("stderr: " + stderr);
-  });
-  res.sendStatus(200);
-});
-
 app.use(doubleCsrfProtection);
 
 app.get("/test", (req, res) => {
+  res.send("test");
+});
+
+app.post("/test", upload.array(), (req, res) => {
   res.send("test");
 });
 
