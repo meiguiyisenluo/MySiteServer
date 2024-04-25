@@ -6,8 +6,6 @@ services:
       context: .
       dockerfile: dockerfile
     command: node app.js
-    volumes:
-      - /home/lys/buildMission:/home/lys/buildMission
     ports:
       - "3000:3000"
     restart: always
