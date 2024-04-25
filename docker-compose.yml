@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: dockerfile
     command: node app.js
+    volumes:
+      - /etc/ssl/luoyisen.com_nginx:/etc/ssl/luoyisen.com_nginx
     ports:
       - "3000:3000"
     restart: always

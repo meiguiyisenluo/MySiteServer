@@ -29,8 +29,8 @@ app.use(cookieParser());
 
 const httpServer = createServer(
   {
-    key: fs.readFileSync("./ssl/luoyisen.com_nginx/luoyisen.com.key"),
-    cert: fs.readFileSync("./ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"),
+    key: fs.readFileSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key"),
+    cert: fs.readFileSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"),
   },
   app
 );
