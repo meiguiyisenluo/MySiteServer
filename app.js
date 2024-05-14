@@ -2,6 +2,8 @@ const uuid = require("uuid");
 const { exec } = require("child_process");
 const { createServer } = require("https");
 const fs = require("fs");
+const dns = require("dns");
+
 const { Server } = require("socket.io");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -11,6 +13,8 @@ const { doubleCsrf } = require("csrf-csrf");
 
 const app = express();
 const port = 3000;
+
+app.set("trust proxy", true);
 
 const {
   generateToken, // Use this in your routes to provide a CSRF hash + token cookie and token.
@@ -30,7 +34,9 @@ app.use(cookieParser());
 const httpServer = createServer(
   {
     key: fs.readFileSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key"),
-    cert: fs.readFileSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"),
+    cert: fs.readFileSync(
+      "/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"
+    ),
   },
   app
 );
@@ -111,6 +117,10 @@ app.get("/", (req, res) => {
   );
 });
 
+app.get("/ipv4", (req, res) => {
+  res.json({ ip: req.ip });
+});
+
 app.get("/csrf-token", (req, res) => {
   const csrfToken = generateToken(req, res);
   // You could also pass the token into the context of a HTML response.
@@ -125,6 +135,26 @@ app.get("/test", (req, res) => {
 
 app.post("/test", upload.array(), (req, res) => {
   res.send("test");
+});
+
+app.post("/ipv4", (req, res) => {
+  res.json({ ip: req.ip });
+});
+
+app.post("/dns-resolve", (req, res) => {
+  const hostname = req.body.hostname;
+  if (!hostname) {
+    return res
+      .status(400)
+      .json({ error: "Hostname body parameter is required" });
+  }
+
+  dns.resolve4(hostname, (err, addresses) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ addresses });
+  });
 });
 
 httpServer.listen(port, () => {
