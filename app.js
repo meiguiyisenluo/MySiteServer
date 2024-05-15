@@ -1,8 +1,6 @@
 const uuid = require("uuid");
-const { exec } = require("child_process");
 const { createServer } = require("https");
 const fs = require("fs");
-const dns = require("dns");
 
 const { Server } = require("socket.io");
 const express = require("express");
@@ -137,25 +135,8 @@ app.post("/test", upload.array(), (req, res) => {
   res.send("test");
 });
 
-app.post("/ipv4", (req, res) => {
-  res.json({ ip: req.ip });
-});
-
-app.post("/dns-resolve", (req, res) => {
-  const hostname = req.body.hostname;
-  if (!hostname) {
-    return res
-      .status(400)
-      .json({ error: "Hostname body parameter is required" });
-  }
-
-  dns.resolve4(hostname, (err, addresses) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ addresses });
-  });
-});
+const networkAbout = require("./controller/networkAbout/index");
+app.use("/networkAbout", networkAbout);
 
 httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
