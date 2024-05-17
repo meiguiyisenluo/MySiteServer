@@ -7,13 +7,13 @@ const dnsServers = [
     dnsName: "百度DNS",
     ip: ["180.76.76.76"],
     officialWebsite: "http://dudns.baidu.com/",
-    remark: "-",
+    remark: "百度旗下",
   },
   {
     dnsName: "阿里DNS",
     ip: ["223.5.5.5", "223.6.6.6"],
     officialWebsite: "http://www.alidns.com/",
-    remark: "-",
+    remark: "阿里巴巴旗下",
   },
   {
     dnsName: "DNSPod",
