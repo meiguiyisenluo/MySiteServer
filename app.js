@@ -115,6 +115,10 @@ app.get("/", (req, res) => {
   );
 });
 
+app.get("/version", (req, res) => {
+  res.send("V0.0.1");
+});
+
 app.get("/ipv4", (req, res) => {
   res.json({ ip: req.ip });
 });
