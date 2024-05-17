@@ -120,7 +120,16 @@ app.get("/version", (req, res) => {
 });
 
 app.get("/ipv4", (req, res) => {
-  res.json({ ip: req.ip });
+  try {
+    const xForwardedFor = req.headers["x-forwarded-for"];
+    const clientIp = xForwardedFor
+      ? xForwardedFor.split(",")[0]
+      : req.connection.remoteAddress;
+
+    res.json({ ip: req.ip, xForwardedFor });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.get("/csrf-token", (req, res) => {
