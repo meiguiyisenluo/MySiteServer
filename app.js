@@ -151,6 +151,9 @@ app.post("/test", upload.array(), (req, res) => {
 const networkAbout = require("./controller/networkAbout/index");
 app.use("/networkAbout", networkAbout);
 
+const fanyi = require("./controller/fanyi/index");
+app.use("/fanyi", fanyi);
+
 httpServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
