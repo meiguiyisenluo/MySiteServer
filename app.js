@@ -119,6 +119,10 @@ app.get("/version", (req, res) => {
   res.send("V0.0.1");
 });
 
+app.get("/500test", (req, res) => {
+  res.status(500);
+});
+
 app.get("/ipv4", (req, res) => {
   try {
     const xForwardedFor = req.headers["x-forwarded-for"];
