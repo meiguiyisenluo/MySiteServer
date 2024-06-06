@@ -116,11 +116,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/version", (req, res) => {
-  res.send("V0.0.1");
+  res.send("V0.0.2");
 });
 
 app.get("/500test", (req, res) => {
-  res.status(500);
+  res.status(500).send('error');
 });
 
 app.get("/ipv4", (req, res) => {
