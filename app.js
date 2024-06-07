@@ -124,20 +124,7 @@ app.get("/500test", (req, res) => {
 });
 
 app.get("/ipv4", (req, res) => {
-  try {
-    const xForwardedFor = req.headers["X-Forwarded-For"];
-    const xRealIp = req.headers["X-Real-IP"];
-    res.json({
-      ip: req.ip,
-      xForwardedFor,
-      xRealIp,
-      clientIp,
-      req,
-      remoteAddress: req.connection.remoteAddress,
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  res.json(req);
 });
 
 app.get("/csrf-token", (req, res) => {
