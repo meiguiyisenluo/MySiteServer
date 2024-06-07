@@ -120,17 +120,21 @@ app.get("/version", (req, res) => {
 });
 
 app.get("/500test", (req, res) => {
-  res.status(500).send('error');
+  res.status(500).send("error");
 });
 
 app.get("/ipv4", (req, res) => {
   try {
-    const xForwardedFor = req.headers["x-forwarded-for"];
-    const clientIp = xForwardedFor
-      ? xForwardedFor.split(",")[0]
-      : req.connection.remoteAddress;
-
-    res.json({ ip: req.ip, xForwardedFor });
+    const xForwardedFor = req.headers["X-Forwarded-For"];
+    const xRealIp = req.headers["X-Real-IP"];
+    res.json({
+      ip: req.ip,
+      xForwardedFor,
+      xRealIp,
+      clientIp,
+      req,
+      remoteAddress: req.connection.remoteAddress,
+    });
   } catch (error) {
     console.log(error);
   }
