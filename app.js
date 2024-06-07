@@ -124,7 +124,18 @@ app.get("/500test", (req, res) => {
 });
 
 app.get("/ipv4", (req, res) => {
-  res.json(req);
+  res.json({
+    ip: req.ip || "",
+    remoteAddress: req.connection.remoteAddress || "",
+    // xForwardedFor: req.headers["X-Forwarded-For"] || "",
+    // xRealIp: req.headers["X-Real-IP"] || "",
+    xForwardedFor: req.headers["x-forwarded-for"] || "",
+    xRealIp: req.headers["x-real-ip"] || "",
+    host: req.headers.host || "",
+    origin: req.headers.origin || "",
+    referer: req.headers.referer || "",
+    headers: req.headers,
+  });
 });
 
 app.get("/csrf-token", (req, res) => {
