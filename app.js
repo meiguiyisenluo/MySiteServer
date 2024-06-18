@@ -39,6 +39,14 @@ const httpServer = createServer(
   app
 );
 
+const getRoom = (socket) => {
+  let roomId = "";
+  socket.rooms.forEach((id) => {
+    if (id !== socket.id) roomId = id;
+  });
+  return roomId;
+};
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -78,10 +86,7 @@ const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
   });
 
   const leaveRoomHandler = async () => {
-    let roomId = "";
-    socket.rooms.forEach((id) => {
-      if (id !== socket.id) roomId = id;
-    });
+    let roomId = getRoom(socket);
     if (!roomId) return;
     const sockets = await _this.in(roomId).fetchSockets();
     sockets.forEach((socket) => {
@@ -90,6 +95,16 @@ const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
     });
   };
 
+  const connectFailed = async () => {
+    let roomId = getRoom(socket);
+    if (!roomId) return;
+    const sockets = await _this.in(roomId).fetchSockets();
+    sockets.forEach((socket) => {
+      socket.emit("connectFailed");
+    });
+  };
+
+  socket.on("connectFailed", connectFailed);
   socket.on("leaveRoom", leaveRoomHandler);
   socket.on("disconnecting", leaveRoomHandler);
   socket.on("disconnect", () => {
@@ -97,10 +112,7 @@ const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
   });
 
   socket.on("webrtc signaling", (data) => {
-    let roomId = "";
-    socket.rooms.forEach((id) => {
-      if (id !== socket.id) roomId = id;
-    });
+    let roomId = getRoom(socket);
     if (!roomId) return;
     socket.to(roomId).emit("webrtc signaling", data);
   });
