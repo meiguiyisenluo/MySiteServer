@@ -19,7 +19,7 @@ const port = 3000;
 
 // 创建 MySQL 连接
 const db = mysql.createConnection({
-  host: "luoyisen.com",
+  host: isProd ? "localhost" : "luoyisen.com",
   user: "root",
   password: "trojan",
   database: "mysite",
@@ -163,7 +163,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/version", (req, res) => {
-  res.send("V0.0.3");
+  res.send("V0.0.4");
 });
 
 app.get("/500test", (req, res) => {
