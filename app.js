@@ -19,7 +19,7 @@ const port = 3000;
 
 // 创建 MySQL 连接
 const db = mysql.createConnection({
-  host: isProd ? "localhost" : "luoyisen.com",
+  host: isProd ? "127.0.0.1" : "luoyisen.com",
   user: "root",
   password: "trojan",
   database: "mysite",
@@ -204,8 +204,8 @@ app.post("/report", upload.array(), (req, res) => {
   if (!req.body.event) return res.status(400).send("error body");
   switch (req.body.event) {
     case "total_pv": {
-      const { xForwardedFor = "127.0.0.1" } = analysisRequest(req);
-      const sql = `insert into mysite_pv (ip) values ('${xForwardedFor}')`;
+      const { xForwardedFor, host } = analysisRequest(req);
+      const sql = `insert into mysite_pv (ip, host) values ('${xForwardedFor}', '${host}')`;
       db.query(sql, (err, results) => {
         if (err) res.status(500).json(err);
         else res.status(200).send(results);
