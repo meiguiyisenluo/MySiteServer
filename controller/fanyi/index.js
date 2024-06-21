@@ -3,11 +3,11 @@ const express = require("express");
 var router = express.Router();
 
 // @see: https://mymemory.translated.net/doc/spec.php
-router.post("/translate", (req, res) => {
-  if (!req.body.text) return res.status(400).send("参数错误");
+router.get("/translate", (req, res) => {
+  if (!req.query.text) return res.status(400).send("参数错误");
   const params = {
-    q: req.body.text,
-    langpair: req.body.langpair,
+    q: req.query.text,
+    langpair: req.query.langpair,
     key: "698e0dc81e14e74533fb",
   };
   axios({
