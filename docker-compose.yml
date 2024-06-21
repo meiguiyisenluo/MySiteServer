@@ -2,9 +2,8 @@ version: "3.8"
 
 services:
   my-site-server:
-    build:
-      context: .
-      dockerfile: dockerfile
+    image: node:18
+    container_name: my-site-server
     command: node app.js
     volumes:
       - /etc/ssl/luoyisen.com_nginx:/etc/ssl/luoyisen.com_nginx

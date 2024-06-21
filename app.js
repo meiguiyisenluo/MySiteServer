@@ -1,6 +1,11 @@
 const uuid = require("uuid");
-const { createServer } = require("https");
+const mysql = require("mysql");
 const fs = require("fs");
+const isProd = fs.existsSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key");
+let createServer = require("http").createServer;
+if (isProd) {
+  createServer = require("https").createServer;
+}
 
 const { Server } = require("socket.io");
 const express = require("express");
@@ -11,6 +16,23 @@ const { doubleCsrf } = require("csrf-csrf");
 
 const app = express();
 const port = 3000;
+
+// 创建 MySQL 连接
+const db = mysql.createConnection({
+  host: "luoyisen.com",
+  user: "root",
+  password: "trojan",
+  database: "mysite",
+  useConnectionPooling: true,
+});
+
+// 连接到 MySQL
+db.connect((err) => {
+  if (err) {
+    console.log(err.message);
+  }
+  console.log("MySQL connected...");
+});
 
 app.set("trust proxy", true);
 
@@ -29,15 +51,16 @@ const {
 const upload = multer(); // for parsing multipart/form-data
 app.use(cookieParser());
 
-const httpServer = createServer(
-  {
-    key: fs.readFileSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key"),
-    cert: fs.readFileSync(
-      "/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"
-    ),
-  },
-  app
-);
+let serverOptions = {};
+if (isProd) {
+  serverOptions.key = fs.readFileSync(
+    "/etc/ssl/luoyisen.com_nginx/luoyisen.com.key"
+  );
+  serverOptions.cert = fs.readFileSync(
+    "/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"
+  );
+}
+const httpServer = createServer(serverOptions, app);
 
 const getRoom = (socket) => {
   let roomId = "";
@@ -46,7 +69,6 @@ const getRoom = (socket) => {
   });
   return roomId;
 };
-
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -121,6 +143,19 @@ const OmgTVNsp = io.of("/OmgTV").on("connection", function (socket) {
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
+function analysisRequest(req) {
+  return {
+    ip: req.ip,
+    remoteAddress: req.connection.remoteAddress,
+    xForwardedFor: req.headers["x-forwarded-for"],
+    xRealIp: req.headers["x-real-ip"],
+    host: req.headers.host,
+    origin: req.headers.origin,
+    referer: req.headers.referer,
+    headers: req.headers,
+  };
+}
+
 app.get("/", (req, res) => {
   res.send(
     "靓仔美女们别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a>"
@@ -128,7 +163,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/version", (req, res) => {
-  res.send("V0.0.2");
+  res.send("V0.0.3");
 });
 
 app.get("/500test", (req, res) => {
@@ -136,18 +171,7 @@ app.get("/500test", (req, res) => {
 });
 
 app.get("/ipv4", (req, res) => {
-  res.json({
-    ip: req.ip || "",
-    remoteAddress: req.connection.remoteAddress || "",
-    // xForwardedFor: req.headers["X-Forwarded-For"] || "",
-    // xRealIp: req.headers["X-Real-IP"] || "",
-    xForwardedFor: req.headers["x-forwarded-for"] || "",
-    xRealIp: req.headers["x-real-ip"] || "",
-    host: req.headers.host || "",
-    origin: req.headers.origin || "",
-    referer: req.headers.referer || "",
-    headers: req.headers,
-  });
+  res.json(analysisRequest(req));
 });
 
 app.get("/csrf-token", (req, res) => {
@@ -164,6 +188,33 @@ app.get("/test", (req, res) => {
 
 app.post("/test", upload.array(), (req, res) => {
   res.send("test");
+});
+
+// 数据统计
+app.get("/statistics", (req, res) => {
+  const sql = "select count(*) as pv from mysite_pv";
+  db.query(sql, (err, results) => {
+    if (err) res.status(500).json(err);
+    else res.json(results[0]);
+  });
+});
+
+// 埋点
+app.post("/report", upload.array(), (req, res) => {
+  if (!req.body.event) return res.status(400).send("error body");
+  switch (req.body.event) {
+    case "total_pv": {
+      const { xForwardedFor = "127.0.0.1" } = analysisRequest(req);
+      const sql = `insert into mysite_pv (ip) values ('${xForwardedFor}')`;
+      db.query(sql, (err, results) => {
+        if (err) res.status(500).json(err);
+        else res.status(200).send(results);
+      });
+      break;
+    }
+    default:
+      break;
+  }
 });
 
 const networkAbout = require("./controller/networkAbout/index");
