@@ -213,6 +213,7 @@ app.post("/report", upload.array(), (req, res) => {
       break;
     }
     default:
+      res.status(400).send("event not found");
       break;
   }
 });

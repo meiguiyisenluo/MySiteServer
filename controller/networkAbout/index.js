@@ -47,7 +47,7 @@ const dnsServers = [
   },
 ];
 
-router.post("/ipv4", (req, res) => {
+router.get("/ipv4", (req, res) => {
   res.json({ ip: req.ip });
 });
 
