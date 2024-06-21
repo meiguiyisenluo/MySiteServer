@@ -51,8 +51,8 @@ router.get("/ipv4", (req, res) => {
   res.json({ ip: req.ip });
 });
 
-router.post("/dns-resolve", async (req, res) => {
-  const hostname = req.body.hostname;
+router.get("/dns-resolve", async (req, res) => {
+  const hostname = req.query.hostname;
   if (!hostname) {
     return res
       .status(400)
