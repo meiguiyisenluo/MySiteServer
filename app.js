@@ -158,16 +158,8 @@ function analysisRequest(req) {
 
 app.get("/", (req, res) => {
   res.send(
-    "靓仔美女们别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a>"
+    "靓仔美女们别搞我，交个朋友：<a href='https://luoyisen.com'>YiSen's Blog</a><br>V0.0.4"
   );
-});
-
-app.get("/version", (req, res) => {
-  res.send("V0.0.4");
-});
-
-app.get("/500test", (req, res) => {
-  res.status(500).send("error");
 });
 
 app.get("/ipv4", (req, res) => {
@@ -181,14 +173,6 @@ app.get("/csrf-token", (req, res) => {
 });
 
 app.use(doubleCsrfProtection);
-
-app.get("/test", (req, res) => {
-  res.send("test");
-});
-
-app.post("/test", upload.array(), (req, res) => {
-  res.send("test");
-});
 
 // 数据统计
 app.get("/statistics", (req, res) => {
