@@ -19,7 +19,7 @@ const port = 3000;
 
 // 创建 MySQL 连接
 const db = mysql.createConnection({
-  host: isProd ? "127.0.0.1" : "luoyisen.com",
+  host: "154.201.80.6",
   user: "root",
   password: "trojan",
   database: "mysite",
