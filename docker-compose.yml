@@ -4,7 +4,7 @@ services:
   my-site-server:
     image: node:18
     container_name: my-site-server
-    command: node app.js
+    command: node ./app.js
     volumes:
       - /etc/ssl/luoyisen.com_nginx:/etc/ssl/luoyisen.com_nginx
       - .:/app
