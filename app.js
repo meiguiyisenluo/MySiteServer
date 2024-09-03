@@ -219,7 +219,9 @@ app.get("/getWXJSSDKTicket", async (req, res) => {
       const url =
         "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx70ce394b697b0891&secret=b3daee3642931dcc36780ee5a9395e42";
 
-      const { access_token, expires_in } = await axios({
+      const {
+        data: { access_token = "", expires_in = 0 },
+      } = await axios({
         method: "get",
         url,
       });
@@ -229,10 +231,13 @@ app.get("/getWXJSSDKTicket", async (req, res) => {
         expires_timestamp: Date.now() + expires_in * 1000,
       };
     }
+    console.log("wxTokenObj=>", wxTokenObj);
 
     if (Date.now() + 0.25 * 60 * 60 * 1000 >= wxTicketObj.expires_timestamp) {
       const url = `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${wxTokenObj.access_token}&type=jsapi`;
-      const { errcode, errmsg, ticket, expires_in } = await axios({
+      const {
+        data: { errcode, errmsg, ticket = "", expires_in = 0 },
+      } = await axios({
         method: "get",
         url,
       });
@@ -243,10 +248,11 @@ app.get("/getWXJSSDKTicket", async (req, res) => {
         expires_timestamp: Date.now() + expires_in * 1000,
       };
     }
+    console.log("wxTicketObj=>", wxTicketObj);
 
     res.status(200).send(wxTicketObj);
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).send("服务器内部错误");
   }
 });
