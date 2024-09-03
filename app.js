@@ -1,4 +1,5 @@
 const uuid = require("uuid");
+const axios = require("axios");
 const mysql = require("mysql");
 const fs = require("fs");
 const isProd = fs.existsSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key");
@@ -199,6 +200,54 @@ app.post("/report", upload.array(), (req, res) => {
     default:
       res.status(400).send("event not found");
       break;
+  }
+});
+
+let wxTokenObj = {
+  access_token: "",
+  expires_in: 7200,
+  expires_timestamp: Date.now(),
+};
+let wxTicketObj = {
+  ticket: "",
+  expires_in: 7200,
+  expires_timestamp: Date.now(),
+};
+app.get("/getWXJSSDKTicket", async (req, res) => {
+  try {
+    if (Date.now() + 0.25 * 60 * 60 * 1000 >= wxTokenObj.expires_timestamp) {
+      const url =
+        "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx70ce394b697b0891&secret=b3daee3642931dcc36780ee5a9395e42";
+
+      const { access_token, expires_in } = await axios({
+        method: "get",
+        url,
+      });
+      wxTokenObj = {
+        access_token,
+        expires_in,
+        expires_timestamp: Date.now() + expires_in * 1000,
+      };
+    }
+
+    if (Date.now() + 0.25 * 60 * 60 * 1000 >= wxTicketObj.expires_timestamp) {
+      const url = `https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${wxTokenObj.access_token}&type=jsapi`;
+      const { errcode, errmsg, ticket, expires_in } = await axios({
+        method: "get",
+        url,
+      });
+      if (errcode !== 0) throw new Error(errmsg);
+      wxTicketObj = {
+        ticket,
+        expires_in,
+        expires_timestamp: Date.now() + expires_in * 1000,
+      };
+    }
+
+    res.status(200).send(wxTicketObj);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("服务器内部错误");
   }
 });
 
