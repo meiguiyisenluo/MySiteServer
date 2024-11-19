@@ -181,17 +181,6 @@ app.get("/getCookie", (req, res) => {
   res.send("贺建豪666");
 });
 
-app.get("/streamVedio", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.status(206);
-  const rs = fs.createReadStream(
-    isProd
-      ? "/www/share/chiikawa/videos/01.mp4"
-      : "D:\\Users\\14021\\Videos\\zst\\01.mp4"
-  );
-  rs.pipe(res);
-});
-
 app.use(doubleCsrfProtection);
 
 // 数据统计
@@ -274,6 +263,18 @@ app.get("/getWXJSSDKTicket", async (req, res) => {
     console.log(error);
     res.status(500).send("服务器内部错误");
   }
+});
+
+// 流式播放视频
+app.get("/streamVedio", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.status(206);
+  const rs = fs.createReadStream(
+    isProd
+      ? "/www/share/chiikawa/videos/01.mp4"
+      : "D:\\Users\\14021\\Videos\\zst\\01.mp4"
+  );
+  rs.pipe(res);
 });
 
 const networkAbout = require("./controller/networkAbout/index");
