@@ -183,14 +183,20 @@ app.get("/getCookie", (req, res) => {
 
 // 流式播放视频
 app.get("/streamVedio", (req, res) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Content-Type", "video/mp4");
-  res.status(206);
-  const rs = fs.createReadStream(
-    isProd
-      ? "/www/share/chiikawa/videos/01.mp4"
-      : "D:\\Users\\14021\\Videos\\zst\\01.mp4"
-  );
+  const videoPath = isProd
+    ? "/www/share/chiikawa/videos/01.mp4"
+    : "D:\\Users\\14021\\Videos\\zst\\01.mp4";
+  const stat = fs.statSync(videoPath);
+
+  res.writeHead(200, {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "video/mp4", // 设置内容类型为视频
+    "Content-Length": stat.size, // 设置文件大小
+    "Accept-Ranges": "bytes", // 支持范围请求
+    "Content-Disposition": "inline", // inline 表示内联播放而不是下载
+  });
+
+  const rs = fs.createReadStream(videoPath);
   rs.pipe(res);
 });
 
