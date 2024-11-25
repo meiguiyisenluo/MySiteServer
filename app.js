@@ -20,9 +20,9 @@ const port = 3000;
 
 // 创建 MySQL 连接
 const db = mysql.createConnection({
-  host: "154.201.80.6",
+  host: "102.134.52.12",
   user: "root",
-  password: "trojan",
+  password: "root",
   database: "mysite",
   useConnectionPooling: true,
 });
