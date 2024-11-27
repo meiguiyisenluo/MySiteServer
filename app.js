@@ -22,7 +22,7 @@ const port = 3000;
 const db = mysql.createConnection({
   host: "102.134.52.12",
   user: "root",
-  password: fs.readFileSync("/www/key/mysql", "utf-8"),
+  password: fs.readFileSync("/www/key/mysql", "utf-8").trim(),
   database: "mysite",
   useConnectionPooling: true,
 });
