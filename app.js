@@ -182,10 +182,19 @@ app.get("/getCookie", (req, res) => {
 });
 
 // 流式播放视频
-app.get("/streamVedio", (req, res) => {
+app.get("/streamVideo", (req, res) => {
+  if (req.headers['x-custom-validate'] !== '15914203799') {
+    res.writeHead(403, {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "text/plain"
+    });
+    return res.end("403 Forbidden: Invalid Referer");
+  }
+
+
   const videoPath = isProd
     ? "/www/share/chiikawa/videos/01.mp4"
-    : "D:\\Users\\14021\\Videos\\zst\\01.mp4";
+    : "C:\\Users\\lys\\Videos\\zst\\01.mp4";
   const stat = fs.statSync(videoPath);
 
   res.writeHead(200, {
