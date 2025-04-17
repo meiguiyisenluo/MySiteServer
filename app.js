@@ -2,7 +2,7 @@ const uuid = require("uuid");
 const axios = require("axios");
 const mysql = require("mysql");
 const fs = require("fs");
-const isProd = fs.existsSync("/etc/ssl/luoyisen.com_nginx/luoyisen.com.key");
+const isProd = fs.existsSync("/etc/ssl/bytedance-me.zone.id/mycert.pem");
 let createServer = require("http").createServer;
 if (isProd) {
   createServer = require("https").createServer;
@@ -55,10 +55,10 @@ app.use(cookieParser());
 let serverOptions = {};
 if (isProd) {
   serverOptions.key = fs.readFileSync(
-    "/etc/ssl/luoyisen.com_nginx/luoyisen.com.key"
+    "/etc/ssl/bytedance-me.zone.id/mykey.pem"
   );
   serverOptions.cert = fs.readFileSync(
-    "/etc/ssl/luoyisen.com_nginx/luoyisen.com_bundle.crt"
+    "/etc/ssl/bytedance-me.zone.id/mycert.pem"
   );
 }
 const httpServer = createServer(serverOptions, app);
