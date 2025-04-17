@@ -19,21 +19,21 @@ const app = express();
 const port = 3000;
 
 // 创建 MySQL 连接
-const db = mysql.createConnection({
-  host: "102.134.52.12",
-  user: "root",
-  password: fs.readFileSync("/www/key/mysql", "utf-8").trim(),
-  database: "mysite",
-  useConnectionPooling: true,
-});
+// const db = mysql.createConnection({
+//   host: "102.134.52.12",
+//   user: "root",
+//   password: fs.readFileSync("/www/key/mysql", "utf-8").trim(),
+//   database: "mysite",
+//   useConnectionPooling: true,
+// });
 
 // 连接到 MySQL
-db.connect((err) => {
-  if (err) {
-    console.log(err.message);
-  }
-  console.log("MySQL connected...");
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.log(err.message);
+//   }
+//   console.log("MySQL connected...");
+// });
 
 app.set("trust proxy", true);
 
@@ -213,30 +213,32 @@ app.use(doubleCsrfProtection);
 
 // 数据统计
 app.get("/statistics", (req, res) => {
-  const sql = "select count(*) as pv from mysite_pv";
-  db.query(sql, (err, results) => {
-    if (err) res.status(500).json(err);
-    else res.json(results[0]);
-  });
+  return res.status(200).send("ok");
+  // const sql = "select count(*) as pv from mysite_pv";
+  // db.query(sql, (err, results) => {
+  //   if (err) res.status(500).json(err);
+  //   else res.json(results[0]);
+  // });
 });
 
 // 埋点
 app.post("/report", upload.array(), (req, res) => {
-  if (!req.body.event) return res.status(400).send("error body");
-  switch (req.body.event) {
-    case "total_pv": {
-      const { xForwardedFor, host } = analysisRequest(req);
-      const sql = `insert into mysite_pv (ip, host) values ('${xForwardedFor}', '${host}')`;
-      db.query(sql, (err, results) => {
-        if (err) res.status(500).json(err);
-        else res.status(200).send(results);
-      });
-      break;
-    }
-    default:
-      res.status(400).send("event not found");
-      break;
-  }
+  return res.status(200).send("ok");
+  // if (!req.body.event) return res.status(400).send("error body");
+  // switch (req.body.event) {
+  //   case "total_pv": {
+  //     const { xForwardedFor, host } = analysisRequest(req);
+  //     const sql = `insert into mysite_pv (ip, host) values ('${xForwardedFor}', '${host}')`;
+  //     db.query(sql, (err, results) => {
+  //       if (err) res.status(500).json(err);
+  //       else res.status(200).send(results);
+  //     });
+  //     break;
+  //   }
+  //   default:
+  //     res.status(400).send("event not found");
+  //     break;
+  // }
 });
 
 let wxTokenObj = {
